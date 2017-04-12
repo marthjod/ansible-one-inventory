@@ -12,6 +12,8 @@ import (
 	"github.com/marthjod/ansoneinv/filter"
 	"github.com/marthjod/gocart/ocatypes"
 	"github.com/marthjod/ansoneinv/config"
+	"sync"
+	"github.com/orcaman/concurrent-map"
 )
 
 const (
@@ -23,12 +25,14 @@ func main() {
 	var (
 		host = flag.String("host", "", "")
 		list = flag.Bool("list", true, "")
+		w sync.WaitGroup
 	)
 	flag.Parse()
 
 	conf, err := config.FromFile(configFile)
 	if err != nil {
 		fmt.Println(err.Error())
+		os.Exit(1)
 	}
 
 	apiClient, err := api.NewClient(conf.Url, conf.Username, conf.Password, &http.Transport{
@@ -45,17 +49,29 @@ func main() {
 		os.Exit(1)
 	}
 
+	tempMap := cmap.New()
+
 	inventory := model.Inventory{}
 	for name, pattern := range conf.GroupFilters {
-		inventory[name] = filter.Filter(vmPool, func(vm *ocatypes.Vm) (string, error) {
-			return vm.UserTemplate.Items.GetCustom(conf.HostnameField)
-		}, pattern)
+		w.Add(1)
+		go func(vmPool *vmpool.VmPool, name, pattern string) {
+			tempMap.Set(name, filter.Filter(vmPool, func(vm *ocatypes.Vm) (string, error) {
+				return vm.UserTemplate.Items.GetCustom(conf.HostnameField)
+			}, pattern))
+
+			w.Done()
+		}(vmPool, name, pattern)
 	}
+
+	w.Wait()
 
 	if *host != "" {
 		fmt.Println("Not implemented yet")
 		os.Exit(1)
 	} else if *list {
+		for k, v := range tempMap.Items() {
+			inventory[k] = v.(model.InventoryGroup)
+		}
 		fmt.Println(inventory)
 	}
 
