@@ -1,0 +1,62 @@
+package main
+
+import (
+	"crypto/tls"
+	flag "github.com/ogier/pflag"
+	"fmt"
+	"github.com/marthjod/gocart/api"
+	"github.com/marthjod/gocart/vmpool"
+	"net/http"
+	"os"
+	"github.com/marthjod/ansoneinv/model"
+	"github.com/marthjod/ansoneinv/filter"
+	"github.com/marthjod/gocart/ocatypes"
+	"github.com/marthjod/ansoneinv/config"
+)
+
+const (
+	configFile = "opennebula-inventory.json"
+)
+
+
+func main() {
+	var (
+		host = flag.String("host", "", "")
+		list = flag.Bool("list", true, "")
+	)
+	flag.Parse()
+
+	conf, err := config.FromFile(configFile)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	apiClient, err := api.NewClient(conf.Url, conf.Username, conf.Password, &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: conf.SslSkipVerify},
+	})
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	vmPool := vmpool.NewVmPool()
+	if err := apiClient.Call(vmPool); err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	inventory := model.Inventory{}
+	for name, pattern := range conf.GroupFilters {
+		inventory[name] = filter.Filter(vmPool, func(vm *ocatypes.Vm) (string, error) {
+			return vm.UserTemplate.Items.GetCustom(conf.HostnameField)
+		}, pattern)
+	}
+
+	if *host != "" {
+		fmt.Println("Not implemented yet")
+		os.Exit(1)
+	} else if *list {
+		fmt.Println(inventory)
+	}
+
+}
