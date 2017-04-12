@@ -1,0 +1,13 @@
+{
+  "username": "oneuser",
+  "password": "secretpassword",
+  "skip_ssl_verify": false,
+  "url": "https://localhost:61443/RPC2",
+  "hostname_field": "HOSTNAME",
+  "group_filters": {
+    "webservers": "^web",
+    "databases": "^db",
+    "staging": "staging$",
+    "all": "."
+  }
+}
