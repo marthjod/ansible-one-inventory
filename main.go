@@ -8,10 +8,10 @@ import (
 	"github.com/marthjod/gocart/vmpool"
 	"net/http"
 	"os"
-	"github.com/marthjod/ansoneinv/model"
-	"github.com/marthjod/ansoneinv/filter"
+	"github.com/marthjod/ansible-one-inventory/model"
+	"github.com/marthjod/ansible-one-inventory/filter"
 	"github.com/marthjod/gocart/ocatypes"
-	"github.com/marthjod/ansoneinv/config"
+	"github.com/marthjod/ansible-one-inventory/config"
 	"sync"
 	"github.com/orcaman/concurrent-map"
 )

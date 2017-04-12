@@ -3,7 +3,7 @@ package filter
 import (
 	"regexp"
 	"github.com/marthjod/gocart/ocatypes"
-	"github.com/marthjod/ansoneinv/model"
+	"github.com/marthjod/ansible-one-inventory/model"
 	"github.com/marthjod/gocart/vmpool"
 )
 

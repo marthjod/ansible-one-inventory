@@ -3,7 +3,7 @@ package config
 import (
 	"io/ioutil"
 	"encoding/json"
-	"github.com/marthjod/ansoneinv/filter"
+	"github.com/marthjod/ansible-one-inventory/filter"
 )
 
 type Config struct {
