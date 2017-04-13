@@ -1,0 +1,14 @@
+username: "oneadmin"
+password: "opennebula"
+skip_ssl_verify: false
+url: "http://one-sandbox:2633/RPC2"
+
+# By default, filters are matched against vm.Name.
+# If hostname_field_in_user_template is set, however,
+# its value will be used to filter VMs.
+# hostname_field_in_user_template: "MY_CUSTOM_FQDN"
+group_filters:
+  all: "."
+  web: "^web"
+  database: "^db"
+  linux: "[Ll]inux"

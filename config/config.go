@@ -1,18 +1,18 @@
 package config
 
 import (
-	"io/ioutil"
-	"encoding/json"
 	"github.com/marthjod/ansible-one-inventory/filter"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 )
 
 type Config struct {
-	Username      string `json:"username"`
-	Password      string `json:"password"`
-	Url           string `json:"url"`
-	SslSkipVerify bool `json:"skip_ssl_verify"`
-	HostnameField string `json:"hostname_field"`
-	GroupFilters  filter.GroupFilters `json:"group_filters"`
+	Username                    string              `yaml:"username"`
+	Password                    string              `yaml:"password"`
+	Url                         string              `yaml:"url"`
+	SslSkipVerify               bool                `yaml:"skip_ssl_verify"`
+	HostnameFieldInUserTemplate string              `yaml:"hostname_field_in_user_template"`
+	GroupFilters                filter.GroupFilters `yaml:"group_filters"`
 }
 
 func FromFile(path string) (*Config, error) {
@@ -22,7 +22,7 @@ func FromFile(path string) (*Config, error) {
 	}
 
 	c := Config{}
-	if err := json.Unmarshal(data, &c); err != nil {
+	if err := yaml.Unmarshal(data, &c); err != nil {
 		return nil, err
 	}
 
