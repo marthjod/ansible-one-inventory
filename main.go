@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"path"
 )
 
 const (
@@ -34,8 +35,9 @@ func main() {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	log.Debug("Loading config ", configFile)
-	conf, err := config.FromFile(configFile)
+	confPath := path.Dir(os.Args[0]) + "/" + configFile
+	log.Debug("Loading config ", confPath)
+	conf, err := config.FromFile(confPath)
 	if err != nil {
 		log.Fatal(err.Error())
 		os.Exit(1)
