@@ -7,8 +7,22 @@ url: "http://one-sandbox:2633/RPC2"
 # If hostname_field_in_user_template is set, however,
 # its value will be used to filter VMs.
 # hostname_field_in_user_template: "MY_CUSTOM_FQDN"
-group_filters:
+
+# Static roles (eg, hosts by environment marker).
+static_group_filters:
   all: "."
-  web: "^web"
-  database: "^db"
+  web: "web"
+  database: "db"
+  app: "app"
   linux: "[Ll]inux"
+
+# Add dynamic roles (eg, hostnames grouped together by FQDN attributes).
+# Ex. Given a pattern "^.{3}-(\w{3})", host "abc-def-ghi" would yield a new group "def".
+# 2 regexp groups.
+dynamic_group_filters:
+  pattern: "^foo-([a-z]{3}).*(example)$"
+  prefix: "foo-"
+  infix: ".+"
+  suffix: "$"
+  # Create more user-friendly group names from the auto-determined patterns.
+  pattern_replace: "(foo|[-.+$])"

@@ -5,16 +5,15 @@ import (
 	"fmt"
 	log "github.com/Sirupsen/logrus"
 	"github.com/marthjod/ansible-one-inventory/config"
+	"github.com/marthjod/ansible-one-inventory/discovery"
 	"github.com/marthjod/ansible-one-inventory/filter"
-	"github.com/marthjod/ansible-one-inventory/model"
+	"github.com/marthjod/ansible-one-inventory/hostnameextractor"
 	"github.com/marthjod/gocart/api"
 	"github.com/marthjod/gocart/ocatypes"
 	"github.com/marthjod/gocart/vmpool"
 	flag "github.com/ogier/pflag"
-	"github.com/orcaman/concurrent-map"
 	"net/http"
 	"os"
-	"sync"
 	"path"
 )
 
@@ -24,11 +23,12 @@ const (
 
 func main() {
 	var (
-		host  = flag.String("host", "", "")
-		list  = flag.Bool("list", true, "")
-		debug = flag.Bool("debug", false, "Enable debug output.")
-		w     sync.WaitGroup
+		host      = flag.String("host", "", "")
+		list      = flag.Bool("list", true, "")
+		debug     = flag.Bool("debug", false, "Enable debug output.")
+		extractor hostnameextractor.HostnameExtractor
 	)
+
 	flag.Parse()
 
 	if *debug {
@@ -59,44 +59,39 @@ func main() {
 		os.Exit(1)
 	}
 
-	hostnameExtractor := func(vm *ocatypes.Vm) (string, error) {
-		return vm.Name, nil
-	}
+	log.Debug("Acquiring hostnames")
+	extractor = &hostnameextractor.VmNameExtractor{}
 	if conf.HostnameFieldInUserTemplate != "" {
-		hostnameExtractor = func(vm *ocatypes.Vm) (string, error) {
-			return vm.UserTemplate.Items.GetCustom(conf.HostnameFieldInUserTemplate)
+		extractor = &hostnameextractor.UserTemplateExtractor{
+			Field: conf.HostnameFieldInUserTemplate,
 		}
 	}
 
-	tempMap := cmap.New()
+	hostNames := discovery.GetHostnames(vmPool, extractor)
 
-	inventory := model.Inventory{}
-	for name, pattern := range conf.GroupFilters {
-		w.Add(1)
-		go func(vmPool *vmpool.VmPool, name, pattern string) {
-			log.Debugf("Populating filter group %q", name)
-			inventoryGroup, err := filter.Filter(vmPool, hostnameExtractor, pattern)
-			if err != nil {
-				log.Error(err.Error())
-			} else {
-				tempMap.Set(name, inventoryGroup)
-			}
+	groupFilters := conf.StaticGroupFilters
 
-			w.Done()
-		}(vmPool, name, pattern)
+	if conf.DynamicGroupFilters.Pattern != "" {
+		fqdnExtractor := func(vm *ocatypes.Vm) string {
+			h, _ := vm.UserTemplate.Items.GetCustom(conf.HostnameFieldInUserTemplate)
+			return h
+		}
+		distinctPatterns := vmPool.GetDistinctVmNamePatternsExtractHostname(
+			conf.DynamicGroupFilters.Pattern, conf.DynamicGroupFilters.Prefix, conf.DynamicGroupFilters.Infix,
+			conf.DynamicGroupFilters.Suffix, fqdnExtractor)
+
+		for pattern, _ := range distinctPatterns {
+			groupFilters[filter.AdjustPatternName(pattern, conf.DynamicGroupFilters.PatternReplace)] = pattern
+		}
 	}
 
-	w.Wait()
+	inventory := discovery.GetInventoryGroups(hostNames, groupFilters)
 
 	if *host != "" {
 		log.Error("--host option not implemented yet")
 		os.Exit(1)
 	} else if *list {
 		log.Debug("Writing inventory")
-		for k, v := range tempMap.Items() {
-			inventory[k] = v.(model.InventoryGroup)
-		}
-
 		fmt.Println(inventory)
 	}
 

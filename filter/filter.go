@@ -3,16 +3,13 @@ package filter
 import (
 	"fmt"
 	"github.com/marthjod/ansible-one-inventory/model"
-	"github.com/marthjod/gocart/ocatypes"
-	"github.com/marthjod/gocart/vmpool"
 	"regexp"
 )
 
 type GroupFilters map[string]string
 
 func Filter(
-	pool *vmpool.VmPool,
-	hostNameExtractor func(*ocatypes.Vm) (string, error),
+	hostNames []string,
 	regex string) (model.InventoryGroup, error) {
 
 	ig := model.InventoryGroup{}
@@ -21,15 +18,16 @@ func Filter(
 		return ig, fmt.Errorf("%q: %s", regex, err.Error())
 	}
 
-	for _, vm := range pool.Vms {
-		hostName, err := hostNameExtractor(vm)
-		if err != nil {
-			return ig, err
-		}
-		if re.MatchString(hostName) {
-			ig = append(ig, hostName)
+	for _, h := range hostNames {
+		if re.MatchString(h) {
+			ig = append(ig, h)
 		}
 	}
 
 	return ig, nil
+}
+
+func AdjustPatternName(regex, replacement string) string {
+	re := regexp.MustCompile(replacement)
+	return re.ReplaceAllString(regex, "")
 }
