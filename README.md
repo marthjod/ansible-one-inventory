@@ -2,7 +2,7 @@
 
 Dynamic Ansible inventory via OpenNebula API.
 
-## Build
+[![Travis CI Build Status](https://travis-ci.org/marthjod/ansible-one-inventory.svg?branch=master)](https://travis-ci.org/marthjod/ansible-one-inventory)
 
 ```bash
 go get -u
