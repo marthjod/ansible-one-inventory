@@ -9,7 +9,6 @@ import (
 	"github.com/marthjod/ansible-one-inventory/filter"
 	"github.com/marthjod/ansible-one-inventory/hostnameextractor"
 	"github.com/marthjod/gocart/api"
-	"github.com/marthjod/gocart/ocatypes"
 	"github.com/marthjod/gocart/vmpool"
 	flag "github.com/ogier/pflag"
 	"net/http"
@@ -39,8 +38,8 @@ func main() {
 	log.Debug("Loading config ", confPath)
 	conf, err := config.FromFile(confPath)
 	if err != nil {
-		log.Fatal(err.Error())
-		os.Exit(1)
+		log.Error(err.Error())
+		log.Fatalf("Config file %s missing (expected in same directory).", configFile)
 	}
 
 	log.Debug("Accessing API at ", conf.Url)
@@ -72,18 +71,18 @@ func main() {
 	groupFilters := conf.StaticGroupFilters
 
 	if conf.DynamicGroupFilters.Pattern != "" {
-		fqdnExtractor := func(vm *ocatypes.Vm) string {
-			h, _ := vm.UserTemplate.Items.GetCustom(conf.HostnameFieldInUserTemplate)
-			return h
-		}
 		distinctPatterns := vmPool.GetDistinctVmNamePatternsExtractHostname(
 			conf.DynamicGroupFilters.Pattern, conf.DynamicGroupFilters.Prefix, conf.DynamicGroupFilters.Infix,
-			conf.DynamicGroupFilters.Suffix, fqdnExtractor)
+			conf.DynamicGroupFilters.Suffix, extractor.Extract)
+
+		log.Debugf("Distinct patterns: %+v", distinctPatterns)
 
 		for pattern, _ := range distinctPatterns {
 			groupFilters[filter.AdjustPatternName(pattern, conf.DynamicGroupFilters.PatternReplace)] = pattern
 		}
 	}
+
+	log.Debugf("Group filters: %+v", groupFilters)
 
 	inventory := discovery.GetInventoryGroups(hostNames, groupFilters)
 

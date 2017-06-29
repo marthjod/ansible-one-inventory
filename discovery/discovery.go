@@ -22,10 +22,7 @@ type AutodiscoveryConfig struct {
 func GetHostnames(pool *vmpool.VmPool, extractor hostnameextractor.HostnameExtractor) []string {
 	var hostNames = []string{}
 	for _, vm := range pool.Vms {
-		h, err := extractor.Extract(vm)
-		if err != nil {
-			log.Error(err.Error())
-		}
+		h := extractor.Extract(vm)
 		hostNames = append(hostNames, h)
 	}
 
