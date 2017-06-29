@@ -25,6 +25,22 @@ one-inv --debug --list
 - `one-inv --host=foo` not implemented yet
 - any non-flag CLI args must be passed with an equals sign
 
+## Test
+
+```
+go test ./...
+```
+
+### Coverage
+
+```
+# for each package
+go test ./... -coverprofile=coverage.out
+go tool cover -html=coverage.out
+
+```
+
+
 ## Ansible
 
 See
