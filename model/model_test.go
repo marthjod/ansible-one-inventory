@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestInventory_String(t *testing.T) {
+func TestString(t *testing.T) {
 	inv := model.Inventory{
 		"web": model.InventoryGroup{
 			"webserver-01",

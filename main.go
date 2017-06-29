@@ -58,7 +58,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Debug("Acquiring hostnames")
 	extractor = &hostnameextractor.VmNameExtractor{}
 	if conf.HostnameFieldInUserTemplate != "" {
 		extractor = &hostnameextractor.UserTemplateExtractor{
@@ -67,6 +66,7 @@ func main() {
 	}
 
 	hostNames := discovery.GetHostnames(vmPool, extractor)
+	log.Debugf("Hostnames: %v", hostNames)
 
 	groupFilters := conf.StaticGroupFilters
 
@@ -83,7 +83,6 @@ func main() {
 	}
 
 	log.Debugf("Group filters: %+v", groupFilters)
-
 	inventory := discovery.GetInventoryGroups(hostNames, groupFilters)
 
 	if *host != "" {

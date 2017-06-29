@@ -30,7 +30,7 @@ var expected = &config.Config{
 	},
 }
 
-func TestFromFileOk(t *testing.T) {
+func TestFromFile(t *testing.T) {
 	path := "testdata/opennebula-inventory.example.yaml"
 
 	actual, err := config.FromFile(path)
@@ -38,7 +38,7 @@ func TestFromFileOk(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Config file %q not loaded correctly: Expected:\n%+v\nActual:\n%+v", path, expected, actual)
+		t.Errorf("Config file %q not loaded correctly. Expected:\n%+v\nActual:\n%+v", path, expected, actual)
 	}
 }
 

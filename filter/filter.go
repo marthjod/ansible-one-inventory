@@ -8,9 +8,7 @@ import (
 
 type GroupFilters map[string]string
 
-func Filter(
-	hostNames []string,
-	regex string) (model.InventoryGroup, error) {
+func Filter(hostNames []string, regex string) (model.InventoryGroup, error) {
 
 	ig := model.InventoryGroup{}
 	re, err := regexp.Compile(regex)
