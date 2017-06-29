@@ -11,18 +11,18 @@ url: "http://one-sandbox:2633/RPC2"
 # Static roles (eg, hosts by environment marker).
 static_group_filters:
   all: "."
-  web: "web"
-  database: "db"
-  app: "app"
-  linux: "[Ll]inux"
+  web: "^web"
+  database: "^db"
+  east: "-east$"
+  west: "-west$"
 
 # Add dynamic roles (eg, hostnames grouped together by FQDN attributes).
 # Ex. Given a pattern "^.{3}-(\w{3})", host "abc-def-ghi" would yield a new group "def".
 # 2 regexp groups.
 dynamic_group_filters:
-  pattern: "^foo-([a-z]{3}).*(example)$"
-  prefix: "foo-"
-  infix: ".+"
-  suffix: "$"
+  pattern: ".+-(staging|production)-(east|west)"
+  prefix: ""
+  infix: "-"
+  suffix: ""
   # Create more user-friendly group names from the auto-determined patterns.
-  pattern_replace: "(foo|[-.+$])"
+  pattern_replace: "-(we|ea)st"

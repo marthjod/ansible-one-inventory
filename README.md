@@ -20,10 +20,14 @@ one-inv --list
 one-inv --debug --list
 ```
 
-## Caveats
+## Caveats, assumptions, limitations
 
-- `one-inv --host=foo` not implemented yet
-- any non-flag CLI args must be passed with an equals sign
+`one-inv --host=foo` not implemented yet.
+
+Any non-flag CLI args must be passed with an equals sign.
+
+The inventory tool assumes that any role or group membership is sufficiently encoded in (and can thus be deduced from) the VM name (or another, explicitly configured hostname field).
+It does not inspect additional attributes for determining group association (although this may change in the future).
 
 ## Test
 
@@ -37,7 +41,51 @@ go test ./...
 # for each package
 go test ./... -coverprofile=coverage.out
 go tool cover -html=coverage.out
+```
 
+## Example
+
+Given VMs with names _db-staging-west_, _web-staging-west_, _db-production-east_ and the following config,
+
+```yaml
+static_group_filters:
+  web: "^web"
+  database: "^db"
+  east: "-east$"
+  west: "-west$"
+dynamic_group_filters:
+  pattern: ".+-(staging|production)-(east|west)"
+  prefix: ""
+  infix: "-"
+  suffix: ""
+  pattern_replace: "-(we|ea)st"
+```
+
+the output will look like this:
+
+```json
+{
+  "database": [
+    "db-production-east",
+    "db-staging-east"
+  ],
+  "east": [
+    "db-production-east",
+    "db-staging-east"
+  ],
+  "production": [
+    "db-production-east"
+  ],
+  "staging": [
+    "db-staging-east"
+  ],
+  "web": [
+    "web-staging-west"
+  ],
+  "west": [
+    "web-staging-west"
+  ]
+}
 ```
 
 
