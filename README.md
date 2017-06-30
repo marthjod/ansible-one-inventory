@@ -88,6 +88,11 @@ the output will look like this:
 }
 ```
 
+## Documentation
+
+```
+godoc -http=:6060
+```
 
 ## Ansible
 
