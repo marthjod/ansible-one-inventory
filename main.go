@@ -53,14 +53,12 @@ func main() {
 	})
 	if err != nil {
 		log.Fatal(err.Error())
-		os.Exit(1)
 	}
 
 	log.Debug("Fetching VM pool")
 	vmPool := vmpool.NewVmPool()
 	if err := apiClient.Call(vmPool); err != nil {
 		log.Fatal(err.Error())
-		os.Exit(1)
 	}
 
 	extractor = &hostnameextractor.VmNameExtractor{}
