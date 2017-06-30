@@ -30,6 +30,8 @@ func Filter(hostNames []string, regex string) (model.InventoryGroup, error) {
 	return ig, nil
 }
 
+// AdjustPatternName can be used to make auto-discovered patterns
+// more readable.
 func AdjustPatternName(regex, replacement string) string {
 	re := regexp.MustCompile(replacement)
 	return re.ReplaceAllString(regex, "")

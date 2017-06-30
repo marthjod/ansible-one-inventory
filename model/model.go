@@ -3,6 +3,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 // An inventory consists of key-mapped InventoryGroups.
@@ -17,7 +18,7 @@ type InventoryGroup []string
 func (i Inventory) Json() string {
 	j, err := json.MarshalIndent(i, "", "  ")
 	if err != nil {
-		return err.Error()
+		return fmt.Sprintf(`{"error": "%s"}`, err.Error())
 	}
 	return string(j)
 }

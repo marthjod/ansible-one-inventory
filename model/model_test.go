@@ -22,7 +22,7 @@ func TestJson(t *testing.T) {
 }`
 	actual := inv.Json()
 	if actual != expected {
-		t.Errorf("String() did no render correctly: Expected:\n%q\nActual:\n%q", expected, actual)
+		t.Errorf("Did not render correctly: Expected:\n%q\nActual:\n%q", expected, actual)
 	}
 }
 
