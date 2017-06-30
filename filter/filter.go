@@ -1,3 +1,4 @@
+// Package filter handles group assignment via hostname filtering.
 package filter
 
 import (
@@ -6,8 +7,12 @@ import (
 	"regexp"
 )
 
+// A GroupFilter is a key-value map mapping group names to regexps
+// which describe hostnames belonging to a respective group.
 type GroupFilters map[string]string
 
+// Takes a list of hostnames and returns an InventoryGroup
+// consisting of those matching regex.
 func Filter(hostNames []string, regex string) (model.InventoryGroup, error) {
 
 	ig := model.InventoryGroup{}
