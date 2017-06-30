@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestString(t *testing.T) {
+func TestJson(t *testing.T) {
 	inv := model.Inventory{
 		"web": model.InventoryGroup{
 			"webserver-01",
@@ -19,7 +19,7 @@ func TestString(t *testing.T) {
     "webserver-02"
   ]
 }`
-	actual := inv.String()
+	actual := inv.Json()
 	if actual != expected {
 		t.Errorf("String() did no render correctly: Expected:\n%q\nActual:\n%q", expected, actual)
 	}
