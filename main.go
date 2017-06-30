@@ -93,7 +93,7 @@ func main() {
 		os.Exit(1)
 	} else if *list {
 		log.Debug("Writing inventory")
-		fmt.Println(inventory)
+		fmt.Println(inventory.Json())
 	}
 
 }
