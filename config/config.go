@@ -1,12 +1,15 @@
+// Package config describes and reads config file structures.
 package config
 
 import (
 	"github.com/marthjod/ansible-one-inventory/discovery"
 	"github.com/marthjod/ansible-one-inventory/filter"
 	"gopkg.in/yaml.v2"
+	"io"
 	"io/ioutil"
 )
 
+// Represents YAML config file.
 type Config struct {
 	Username                    string                        `yaml:"username"`
 	Password                    string                        `yaml:"password"`
@@ -17,8 +20,9 @@ type Config struct {
 	DynamicGroupFilters         discovery.AutodiscoveryConfig `yaml:"dynamic_group_filters"`
 }
 
-func FromFile(path string) (*Config, error) {
-	data, err := ioutil.ReadFile(path)
+// Unmarshals Config struct from Reader.
+func FromFile(r io.Reader) (*Config, error) {
+	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}

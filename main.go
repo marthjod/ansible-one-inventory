@@ -36,7 +36,12 @@ func main() {
 
 	confPath := path.Dir(os.Args[0]) + "/" + configFile
 	log.Debug("Loading config ", confPath)
-	conf, err := config.FromFile(confPath)
+	f, err := os.Open(confPath)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	defer f.Close()
+	conf, err := config.FromFile(f)
 	if err != nil {
 		log.Error(err.Error())
 		log.Fatalf("Config file %s missing (expected in same directory).", configFile)

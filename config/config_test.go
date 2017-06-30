@@ -4,6 +4,7 @@ import (
 	"github.com/marthjod/ansible-one-inventory/config"
 	"github.com/marthjod/ansible-one-inventory/discovery"
 	"github.com/marthjod/ansible-one-inventory/filter"
+	"os"
 	"reflect"
 	"testing"
 )
@@ -32,8 +33,13 @@ var expected = &config.Config{
 
 func TestFromFile(t *testing.T) {
 	path := "testdata/opennebula-inventory.example.yaml"
+	f, err := os.Open(path)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+	defer f.Close()
 
-	actual, err := config.FromFile(path)
+	actual, err := config.FromFile(f)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,14 +53,12 @@ func TestFromFileErr(t *testing.T) {
 		err error
 	)
 
-	path := "doesnotexist"
-	_, err = config.FromFile(path)
-	if err == nil {
-		t.Error("No error returned for non-existing config file!")
+	f, err := os.Open("testdata/invalid-config.yaml")
+	if err != nil {
+		t.Fatal(err.Error())
 	}
-
-	path = "testdata/invalid-config.yaml"
-	cfg, err := config.FromFile(path)
+	defer f.Close()
+	cfg, err := config.FromFile(f)
 	if err == nil {
 		t.Error("No error returned for invalid config file!")
 	}
