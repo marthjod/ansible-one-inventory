@@ -98,7 +98,7 @@ func TestGetInventoryGroups(t *testing.T) {
 
 	actual := discovery.GetInventoryGroups(hostNames, filters)
 	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Unexpected return value. Expected:\n%s\nActual:\n%s", expected, actual)
+		t.Errorf("Unexpected return value. Expected:\n%v\nActual:\n%v", expected, actual)
 	}
 }
 
@@ -113,6 +113,6 @@ func TestGetInventoryGroupsErr(t *testing.T) {
 
 	actual := discovery.GetInventoryGroups(hostNames, filters)
 	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Unexpected return value. Expected:\n%s\nActual:\n%s", expected, actual)
+		t.Errorf("Unexpected return value. Expected:\n%vnActual:\n%v", expected, actual)
 	}
 }
